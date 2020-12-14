@@ -1,3 +1,6 @@
 {
-"mongoURI": "mongodb+srv://yuhyun123:yuhyun123@devconnector.gppcj.mongodb.net/DbConnector?retryWrites=true&w=majority"
+"mongoURI": "mongodb+srv://yuhyun123:yuhyun123@devconnector.gppcj.mongodb.net/DbConnector?retryWrites=true&w=majority",
+"jwtSecret": "mysecrettoken",
+"githubClientId": "6e3fe49a058aa1f6b483",
+"gihubSecret": "5ae61bad2c3838bbc95cf8a7d961e102525365a3"
 }
