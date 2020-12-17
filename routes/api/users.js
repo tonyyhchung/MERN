@@ -12,104 +12,80 @@ const User = require('../../models/User');
 // @route   POST api/users
 // @desc    Register user
 // @access  Public
+router.post(
+    '/', 
+    [
+        check('name', 'Name is required').not().isEmpty(),
+        check('email','Please include a valid email').isEmail(),
+        check('password','Please enter a password with 6 or more characters').isLength({min: 6})
+    ], 
+    async (req, res) => { // req = rquest // res = response
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            console.log("ge");
+            return res.status(400).json({errors: errors.array()});
+            // 400 bad request
+        }
 
-router.post('/', (req,res) => {
-    console.log(req.body);
-    res.send('User route');
-});
+        const {name, email, password} = req.body;
 
-// router.post(
-//     '/',
-//     [
-//         check('name', 'Name is required').not().isEmpty(),
-//         check('email','Please include a valid email').isEmail(),
-//         check('password','Please enter a password with 6 or more characters').isLength({min: 6})
-//     ],
-//     (req, res) => {
-//             const errors = validationResult(req);
-//             if(!errors.isEmpty()){
-//                 console.log("ge");
-//                 return res.status(400).json({errors: errors.array()});
-//                 // 400 bad request
-//             }
-//     }
-// )
+        try{
 
+            // See if user exists
+            let user = await User.findOne({email: email});
+            if(user){
+                return res.status(400).json({errors: [{msg: 'User already exists'}] });
+            }
 
-// router.post(
-//     '/', 
-//     [
-//         check('name', 'Name is required').not().isEmpty(),
-//         check('email','Please include a valid email').isEmail(),
-//         check('password','Please enter a password with 6 or more characters').isLength({min: 6})
-//     ], 
-//     async (req, res) => { // req = rquest // res = response
-//         const errors = validationResult(req);
-//         if(!errors.isEmpty()){
-//             console.log("ge");
-//             return res.status(400).json({errors: errors.array()});
-//             // 400 bad request
-//         }
+            // Get users gravatar -> if input user is not found reaches here
+            const avatar = gravatar.url(email, {
+                s: '200',
+                r: 'pg',
+                d: 'mm'
+            })
 
-//         const {name, email, password} = req.body;
+            //just creates an instance
+            user = new User({
+                name,
+                email,
+                avatar,
+                password
+            });
 
-//         try{
+            // Encrypt password
+            const salt = await bcrypt.genSalt(10);
 
-//             // See if user exists
-//             let user = await User.findOne({email: email});
-//             if(user){
-//                 return res.status(400).json({errors: [ {msg: 'User already exists'}]});
-//             }
+            user.password = await bcrypt.hash(password,salt)
 
-//             // Get users gravatar -> if input user is not found reaches here
-//             const avaatar = gravatar.url(emali,{
-//                 s: '200',
-//                 r: 'pg',
-//                 d: 'mm'
-//             })
+            // Save the user in the db
+            await user.save();
 
-//             //just creates an instance
-//             user = new User({
-//                 name,
-//                 email,
-//                 avatar,
-//                 password
-//             });
+            // Return jsonwebtoken
+            const payload = {
+                user: {
+                    id: user.id
+                }
+            }
 
-//             // Encrypt password
-//             const salt = await bcrypt.genSalt(10);
+            jwt.sign(
+                payload, 
+                config.get('jwtSecret'),
+                {expiresIn: 360000},
+                (err, token)=>{
+                    if(err) throw err;
+                    res.json({token});
+                }
+            );
 
-//             user.password = await bcrypt.hash(password,salt)
+            // res.send('User registered');
 
-//             // Save the user in the db
-//             await user.save();
-
-//             // Return jsonwebtoken
-
-//             const payload = {
-//                 user: {
-//                     id: user.id
-//                 }
-//             }
-
-//             jwt.sign(
-//                 payload, 
-//                 config.get('jwtSecret'),
-//                 {expiresIn: 360000},
-//                 (err, token)=>{
-//                     if(err) throw err;
-//                     res.json({token});
-//                 });
-
-//             // res.send('User registered');
-
-//         }catch(err){
-//             console.error(err.message);
-//             res.status(500).send('server error');
-//         }
+        }catch(err){
+            console.error(err.message);
+            res.status(500).send('server error');
+        }
 
     
-//     }
-// );
+    }
+);
 
 module.exports = router;

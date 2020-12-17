@@ -12,9 +12,10 @@ const User = require('../../models/User');
 // @route   GET api/auth
 // @desc    Test route
 // @access  Public
-router.get('./',auth, async (req, res) => {
+router.get('/',auth, async (req, res) => {
     try{
-        const user = await (await User.findById(req.user.id)).isSelected('-password'); // leave of the password
+
+        const user = await User.findById(req.user.id).select('-password'); // leave of the password
         res.json(user);
 
     }catch(err){
@@ -27,7 +28,7 @@ router.get('./',auth, async (req, res) => {
 // @desc    Authenticate user & get token
 // @access  Public
 router.post(
-    './', 
+    '/', 
     [
         check('email','Please include a valid email').isEmail(),
         check('password','Password is required').exists()
@@ -56,7 +57,6 @@ router.post(
             }
 
             // Return jsonwebtoken
-
             const payload = {
                 user: {
                     id: user.id
@@ -70,8 +70,8 @@ router.post(
                 (err, token)=>{
                     if(err) throw err;
                     res.json({token});
-                });
-
+                }
+            );
 
         }catch(err){
             console.error(err.message);
