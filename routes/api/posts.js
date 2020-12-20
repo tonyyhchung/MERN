@@ -64,14 +64,14 @@ router.get('/',auth,async(req,res) => {
 
 router.get('/:id',auth,async(req,res) => {
     try {
-        const post = await Post.findById(req.params.id); // date: -1 -=> the first one will be the recently added post
+        const post = await Post.findById(req.params.id);
 
         if(!post){
             return res.status(404).json({msg: 'Post not found'});
         }
 
         res.json(post);
-    } catch (error) {
+    } catch (err) {
         console.error(err.message);
         if(err.kind === 'ObjectId'){
             return res.status(404).json({msg: 'Post not found'});
@@ -86,10 +86,9 @@ router.get('/:id',auth,async(req,res) => {
 
 router.delete('/:id',auth,async(req,res) => {
     try {
-        const post = await Post.findById(req.params.id); // date: -1 -=> the first one will be the recently added post
+        const post = await Post.findById(req.params.id);
         
-        // Check user
-
+        // Check post
         if(!post){
             return res.status(404).json({msg: 'Post not found'});
         }
@@ -101,7 +100,7 @@ router.delete('/:id',auth,async(req,res) => {
         await post.remove();
 
         res.json({msg: 'Post removed'});
-    } catch (error) {
+    } catch (err) {
         console.error(err.message);
         if(err.kind === 'ObjectId'){
             return res.status(404).json({msg: 'Post not found'});
@@ -141,7 +140,7 @@ router.put('/like/:id', auth, async (req, res) => {
 // @desc    Unlike a post
 // @access  Private
 
-router.put('/like/:id', auth, async (req, res) => {
+router.put('/unlike/:id', auth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
 
@@ -175,13 +174,15 @@ router.post('/comment/:id', [
     [check('text','text is requried').not().isEmpty()]],
     async (req, res) => {
         const errors = validationResult(req);
+
         if(!errors.isEmpty()) {
+            console.log("11");
             return res.status(400).json({errors: errors.array()});
         }
 
         try {
             const user = await User.findById(req.user.id).select('-password');
-            const post = await Post.findById(req.user.id).select('-password');
+            const post = await Post.findById(req.params.id);
 
             const newComment = {
                 text: req.body.text,
@@ -192,10 +193,10 @@ router.post('/comment/:id', [
 
             post.comments.unshift(newcomment);
 
-            await newPost.save();
+            await post.save();
 
             res.json(post.comments);
-        } catch (error) {
+        } catch (err) {
             console.error(err.message);
             res.status(500).send('Server Error');
         }
