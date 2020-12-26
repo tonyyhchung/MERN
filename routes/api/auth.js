@@ -30,14 +30,15 @@ router.get('/',auth, async (req, res) => {
 router.post(
     '/', 
     [
-        check('email','Please include a valid email').not().isEmail(),
-        check('password','Password is required').not().exists()
+        check('email', 'Please include a valid email').isEmail(),
+        check('password', 'Password is required').exists()
     ], 
     async (req, res) => { // req = rquest // res = response
         // console.log(req.body);
 
-        //console.log(req);
+        console.log("ss" + req.body);
         const errors = validationResult(req);
+
         if(!errors.isEmpty()){
             return res.status(400).json({errors: errors.array()});
         }
