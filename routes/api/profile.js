@@ -5,6 +5,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const Post = require('../../models/Post');
 const {check, validationResult} = require('express-validator')
 const normalize = require('normalize-url');
 
@@ -42,19 +43,32 @@ router.post('/',
             return res.status(400).json({errors: errors.array()})
         }
 
+        // const {
+        //     company,
+        //     website,
+        //     location,
+        //     bio,
+        //     status,
+        //     githubusername,
+        //     skills,
+        //     youtube,
+        //     facebook,
+        //     twitter,
+        //     instagram,
+        //     linkedin
+        // } = req.body;
+
+        // destructure the request
         const {
-            company,
             website,
-            location,
-            bio,
-            status,
-            githubusername,
             skills,
             youtube,
-            facebook,
             twitter,
             instagram,
-            linkedin
+            linkedin,
+            facebook,
+            // spread the rest of the fields we don't need to check
+            ...rest
         } = req.body;
 
         // Build profile object
@@ -106,7 +120,7 @@ router.post('/',
 
             if(profile){
                 //update
-                profile = await Profile.findOneAndUpdate(
+                profile = await Profile.useFindAndModify(
                     {user: req.user.id},
                     {$set: profileFields},
                     {new: true}
@@ -175,6 +189,8 @@ router.delete('/', auth, async (req, res) => {
 
     try{
         // @todo - remove users posts
+        // remove user posts
+        await Post.deleteMany({user: req.user.id});
 
         // Remove profile
         await Profile.findOneAndRemove({user: req.user.id});
@@ -199,7 +215,9 @@ router.put('/experience',[auth, [
     check('from','From date is required').not().isEmpty()
 ]], async (req,res) => {
     const errors = validationResult(req);
+    console.log(req.body.title)
     if(!errors.isEmpty()){
+        console.log("here");
         return res.status(400).json({errors: errors.array()});
     }
 
@@ -210,7 +228,7 @@ router.put('/experience',[auth, [
         from,
         to,
         current,
-        descrition
+        description
     } = req.body;
 
     const newExp ={
@@ -220,7 +238,7 @@ router.put('/experience',[auth, [
         from,
         to,
         current,
-        descrition
+        description
     }
 
     try{
