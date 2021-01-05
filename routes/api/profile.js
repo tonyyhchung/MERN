@@ -217,7 +217,8 @@ router.put('/experience',[auth, [
     const errors = validationResult(req);
     console.log(req.body.title)
     if(!errors.isEmpty()){
-        console.log("here");
+        console.log("profile.js - add experience");
+        console.log(errors.array());
         return res.status(400).json({errors: errors.array()});
     }
 
