@@ -18,6 +18,7 @@ export const getCurrentProfile = () => async dispatch => {
             type: GET_PROFILE,
             payload: res.data
         });
+        
     } catch (err) {
 
         dispatch({
@@ -64,7 +65,6 @@ export const createProfile = (formData, history, edit = false) => async dispatch
     }
 }
 
-// Add Experience
 export const addExperience = (formData, history) => async dispatch => {
     try {
         const config = {
@@ -152,6 +152,10 @@ export const deleteExperience = id => async dispatch => {
 
        dispatch(setAlert('Experience Removed', 'success'));
     } catch (err) {
+
+        console.log(err);
+
+        console.log(err);
         dispatch({
             type: PROFILE_ERROR,
             payload: { msg: err.response.statusText, status: err.response.status}

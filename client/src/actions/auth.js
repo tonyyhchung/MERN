@@ -77,7 +77,6 @@ export const login = (email, password) => async dispatch => {
         }
     };
 
-    console.log(email);
     const body = JSON.stringify({email, password});
 
     try {
