@@ -7,13 +7,14 @@ import { getProfiles } from '../../actions/profile';
 
 
 
-const Profiles = ({getprofiles, profile: {profiles, loading} }) => {
+const Profiles = ({getProfiles, profile: {profiles, loading} }) => {
     
     useEffect(()=>{
         console.log("test");
         getProfiles();
+        console.log("d: " + profiles.length)
         console.log("test1");
-    },[]);
+    },[getProfiles]);
 
     return (
         <Fragment>
@@ -23,7 +24,7 @@ const Profiles = ({getprofiles, profile: {profiles, loading} }) => {
                      <p className="lead">
                          <i className="fab fa-connectdevelop"></i> Browse and connect with developers
                      </p>
-                     <div className="prrofiles">
+                     <div className="profiles">
                         {profiles.length > 0 ? (
                             profiles.map(profile => (
                                 <ProfileItem key={profile._id} profile={profile}/>
@@ -35,6 +36,7 @@ const Profiles = ({getprofiles, profile: {profiles, loading} }) => {
         </Fragment>
     )
 }
+
 
 Profiles.propTypes = {
     getProfiles: PropTypes.func.isRequired,

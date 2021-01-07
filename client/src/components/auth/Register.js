@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { setAlert } from '../../actions/alert'; 
 import { register } from '../../actions/auth'; 
 import PropTypes from 'prop-types';
-import { profile_url } from 'gravatar';
 
 
 const Register = ({ setAlert, register, isAuthenticated}) => {
