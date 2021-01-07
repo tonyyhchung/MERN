@@ -52,7 +52,7 @@ const AddExperience = ({addExperience, history}) => {
                 </div>
                 <div className="form-group">
                 <p><input type="checkbox" name="current" checked = {current} value = {current} onChange = {e => {
-                    setFormData({...setFormData, current: !current});
+                    setFormData({...formData, current: !current});
                     toggleDisabled(!toDateDisabled);
                 }}  /> {' '} Current Job</p>
                 </div>
